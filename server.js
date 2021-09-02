@@ -39,20 +39,17 @@ app.post('/api/notes', (req, res) => {
         )
     }
 })
-app.delete('/api/notes', (req, res) => {
-    const dataId = req.params.id;
-    readFromFile('./db/db.json')
-      .then((data) => JSON.parse(data))
-      .then((json) => {
-        // Make a new array of all tips except the one with the ID provided in the URL
-        const result = json.filter((dataDB) => id !== id);
-  
-        // Save that array to the filesystem
-        writeToFile('./db/db.json', result);
-  
-        // Respond to the DELETE request
-        res.json(`Item ${dataId} has been deleted 🗑️`);
-      });
+app.delete('/api/notes/:id', (req, res) => {
+    const noteId = req.params.id;
+    readFromFile('./db/tips.json')
+    .then((data) => JSON.parse(data))
+    .then((json) => {
+      const result = json.filter((id) => id.noteId !== noteId);
+
+      writeToFile('./db/db.json', result);
+
+      res.json(`Item ${noteId} has been deleted 🗑️`);
+    });
   });
 
 app.get('/notes', (req, res) =>

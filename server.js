@@ -2,9 +2,12 @@ const express = require('express');
 const path = require('path');
 const api = require('./routes/index.js');
 const fs = require('fs')
-const db = require('./db/db.json')
+let db = require('./db/db.json')
 const uuid = require('./helpers/uuid');
-
+const {
+    readFromFile,
+    writeToFile,
+  } = require('./helpers/fsUtils');
 
 const PORT = process.env.PORT || 3001;
 
@@ -35,21 +38,22 @@ app.post('/api/notes', (req, res) => {
         db.push(newDb)
         fs.writeFile(
             './db/db.json',
-            JSON.stringify(db, null, 1),
+            JSON.stringify(db, null, 1), () => {
+                res.send('saved')
+            }
         )
     }
 })
 app.delete('/api/notes/:id', (req, res) => {
     const noteId = req.params.id;
-    readFromFile('./db/tips.json')
-    .then((data) => JSON.parse(data))
-    .then((json) => {
-      const result = json.filter((id) => id.noteId !== noteId);
-
-      writeToFile('./db/db.json', result);
+        console.log(db);   
+        console.log(noteId);   
+       db = db.filter((note) => note.id !== noteId);
+        console.log(db)
+      writeToFile('./db/db.json', db);
 
       res.json(`Item ${noteId} has been deleted 🗑️`);
-    });
+      console.log('test')
   });
 
 app.get('/notes', (req, res) =>
